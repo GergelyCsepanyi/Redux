@@ -3,6 +3,7 @@ import {fetchPhotos} from '../actions/async/fetchPhotos';
 import {likePhoto} from '../actions/async/likePhoto';
 import {unlikePhoto} from '../actions/async/unlikePhoto';
 import {searchPhotos} from '../actions/async/searchPhotos';
+import {fetchMorePhotos} from '../actions/async/fetchMorePhotos';
 
 export type PhotoModel = {
   id: string;
@@ -32,6 +33,9 @@ export const photosSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(fetchPhotos.fulfilled, (state, action) => {
       state.items = action.payload;
+    });
+    builder.addCase(fetchMorePhotos.fulfilled, (state, action) => {
+      state.items = state.items.concat(action.payload);
     });
     builder.addCase(likePhoto.fulfilled, (state, action) => {
       console.log('like action:', action.payload);

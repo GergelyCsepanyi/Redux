@@ -2,8 +2,8 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {imageApi} from '../../../services/ImageApi';
 import {PhotoModel} from '../../reducers/photosReducer';
 
-export const fetchPhotos = createAsyncThunk<Array<PhotoModel>, number>(
-  'photos/fetchPhotos',
+export const fetchMorePhotos = createAsyncThunk<Array<PhotoModel>, number>(
+  'photos/fetchMorePhotos',
   async (page: number = 1, thunkApi) => {
     try {
       const response = await imageApi.fetchPhotos(page);
@@ -17,7 +17,7 @@ export const fetchPhotos = createAsyncThunk<Array<PhotoModel>, number>(
         likesCount: item.likes,
       }));
     } catch (error) {
-      console.log('fetchPhotos error: ', error);
+      console.log('fetchMorePhotos error: ', error);
       return thunkApi.rejectWithValue(error);
     }
   },

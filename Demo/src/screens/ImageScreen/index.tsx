@@ -21,6 +21,7 @@ import {unlikePhoto} from '../../redux/actions/async/unlikePhoto';
 import {SearchBar} from '@rneui/base';
 import {searchPhotos} from '../../redux/actions/async/searchPhotos';
 import DropdownComponent, {DropdownData} from '../../components/Dropdown';
+import {fetchMorePhotos} from '../../redux/actions/async/fetchMorePhotos';
 
 export interface ImageScreenState {
   images: Array<PhotoModel>;
@@ -32,6 +33,8 @@ const dropdownDataList: DropdownData[] = [
   {label: 'Oldest', value: 'oldest'},
   {label: 'Popular', value: 'popular'},
 ];
+
+const initialImagePageNumber = 1;
 
 const RenderItem = (props: {
   itemInfo: ListRenderItemInfo<PhotoModel>;
@@ -47,7 +50,8 @@ const RenderItem = (props: {
   useEffect(() => {
     // setIsLiked(item.isLiked);
     // setLikesCount(item.likesCount);
-  }, [images, item.isLiked, item.likesCount]);
+    console.log('image changed:', item.id);
+  }, [item.isLiked, item.likesCount]);
 
   const onToggleLike = () => {
     if (item.isLiked) {
@@ -76,8 +80,10 @@ const RenderItem = (props: {
           profileUrl: item.profileImageUrl,
         }}
         footerProps={{
-          isLiked,
-          likesCount,
+          // TODO: isLiked, // in this way I pass through the local state that I dont update
+          // TODO: likesCount,
+          isLiked: item.isLiked,
+          likesCount: item.likesCount,
           onToggleLike,
           imageId: item.id,
         }}
@@ -100,77 +106,72 @@ const ItemSeparatorComponent = () => {
 
 const ImageScreen = () => {
   const [refreshing, setRefreshing] = useState(true);
-  const isLoading = useAppSelector(state => state.photos.loading);
+  //const isLoading = useAppSelector(state => state.photos.loading);
   // const [images, setImages] = useState([] as PhotoModel[]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialImagePageNumber);
   const [searchInputValue, setSearchInputValue] = useState('');
   const dispatch = useAppDispatch();
   const photos = useAppSelector(state => state.photos.items);
   const [imagesView, setImagesView] = useState(photos);
   const [orderBy, setOrderBy] = useState(dropdownDataList[0]);
 
-  useEffect(() => {
-    console.log('images loading?', isLoading);
-  }, [isLoading]);
+  const onRefresh = () => {
+    // imageApi
+    //   .fetchPhotos(page)
+    //   .then(values => {
+    //     // setImages(formatToPhotoModelArray(values));
+    //     setRefreshing(false);
+    //     setCurrentPage(1);
+    //   })
+    //   .catch(error => console.log('fetch error: ', error));
+    setRefreshing(true);
+    setCurrentPage(initialImagePageNumber);
+    dispatch(fetchPhotos(initialImagePageNumber));
+  };
 
-  // const loadPhotos = useCallback((page: number = 1) => {
-  //   imageApi
-  //     .fetchPhotos(page)
-  //     .then(values => {
-  //       // setImages(formatToPhotoModelArray(values));
-  //       setRefreshing(false);
-  //       setCurrentPage(1);
-  //     })
-  //     .catch(error => console.log('fetch error: ', error));
-  // }, []);
+  useEffect(() => {
+    setImagesView(photos);
+    setRefreshing(false);
+  }, [photos]);
 
   useEffect(() => {
-    if (searchInputValue !== '') {
+    if (searchInputValue === '') {
       setImagesView([]);
     }
   }, [searchInputValue]);
 
   useEffect(() => {
-    dispatch(fetchPhotos())
-      .then(() => {
-        setImagesView(photos);
-        setRefreshing(false);
-      })
-      .catch(err => console.log('error: ', err));
+    dispatch(fetchPhotos(initialImagePageNumber));
+
+    setRefreshing(true);
+    // .then(() => {
+    //   //setImagesView(photos);
+    // })
+    // .catch(err => console.log('error: ', err));
     // console.log('fetch photos');
     // setImagesView([]);
     // setRefreshing(false);
   }, [dispatch]);
 
-  // const formatToPhotoModelArray = (
-  //   values: PhotoDataResponse[],
-  // ): PhotoModel[] => {
-  //   return values.map(value => ({
-  //     id: value.id,
-  //     imageUrl: value.urls?.small,
-  //     isLiked: value.liked_by_user,
-  //     profileImageUrl: value.user?.profile_image?.small,
-  //     name: value.user?.name,
-  //     likesCount: value.likes,
-  //   }));
-  // };
+  const fetchMore = () => {
+    if (refreshing) {
+      return;
+    }
+    setRefreshing(true);
 
-  // const fetchMore = () => {
-  //   if (refreshing) {
-  //     return;
-  //   }
-  //   setRefreshing(true);
+    const nextPage = currentPage + 1;
+    console.log('currentPAge:', currentPage);
+    // imageApi.fetchPhotos(nextPage).then(values => {
+    //   const newData = formatToPhotoModelArray(values);
 
-  //   const nextPage = currentPage + 1;
+    //   setCurrentPage(nextPage);
+    //   setRefreshing(false);
+    //   setImages(currentData => [...currentData, ...newData]);
+    // });
 
-  //   imageApi.fetchPhotos(nextPage).then(values => {
-  //     const newData = formatToPhotoModelArray(values);
-
-  //     setCurrentPage(nextPage);
-  //     setRefreshing(false);
-  //     setImages(currentData => [...currentData, ...newData]);
-  //   });
-  // };
+    dispatch(fetchMorePhotos(nextPage));
+    setCurrentPage(nextPage);
+  };
 
   const handleStartSearching = () => {
     console.log('start searching');
@@ -180,11 +181,14 @@ const ImageScreen = () => {
   const handleEndSearching = () => {
     console.log('end searching: ', searchInputValue);
     if (searchInputValue !== '') {
-      dispatch(searchPhotos(searchInputValue)).then(() =>
-        setImagesView(photos),
-      );
+      dispatch(searchPhotos(searchInputValue));
+      // .then(() =>
+      //   setImagesView(photos),
+      // );
+      setRefreshing(true);
     } else {
-      setImagesView(photos);
+      //setImagesView(photos);
+      dispatch(fetchPhotos(initialImagePageNumber));
     }
   };
 
@@ -224,11 +228,11 @@ const ImageScreen = () => {
         )}
         ListEmptyComponent={ListEmptyComponent}
         ItemSeparatorComponent={ItemSeparatorComponent}
-        // refreshControl={
-        //   <RefreshControl refreshing={refreshing} onRefresh={loadPhotos} />
-        // }
-        // onEndReached={fetchMore}
-        // onEndReachedThreshold={0.1}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        onEndReached={fetchMore}
+        onEndReachedThreshold={0.1}
       />
     </BackgroundForm>
   );

@@ -1,7 +1,7 @@
 import {API_ACCESSTOKEN} from '@env';
 import {RequestType, request} from './apiManager';
 
-const ACCESS_TOKEN = API_ACCESSTOKEN;
+const ACCESS_TOKEN = 'dNOyZuHMQNgn6cG3P8KaGtIPPhiqXk0aDtS4310yhwk';
 
 export type PhotoDataResponse = {
   id: string;
@@ -44,6 +44,7 @@ class ImageApi<T> implements ImageApiInterface<T> {
   }
 
   async searchPhotos(query: string): Promise<T[]> {
+    console.log(ACCESS_TOKEN);
     return request<Array<T>>(RequestType.searchPhotos, {
       token: ACCESS_TOKEN,
       urlParams: {query},
