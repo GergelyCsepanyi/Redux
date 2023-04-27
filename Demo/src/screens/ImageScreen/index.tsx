@@ -41,33 +41,25 @@ const RenderItem = (props: {
   images: PhotoModel[];
 }) => {
   const {item} = props.itemInfo;
-  const {images} = props;
 
   const [isLiked, setIsLiked] = useState(item.isLiked);
   const [likesCount, setLikesCount] = useState(item.likesCount);
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    // setIsLiked(item.isLiked);
-    // setLikesCount(item.likesCount);
-    console.log('image changed:', item.id);
-  }, [item.isLiked, item.likesCount]);
-
   const onToggleLike = () => {
-    if (item.isLiked) {
+    if (isLiked) {
+      // TODO: in this way, it is slower but it will only update the states if the server process our request
       dispatch(unlikePhoto(item.id)).then(res => {
         if ((res?.payload as PhotoModel).id === item.id) {
-          //setLikesCount(currentLikesState => --currentLikesState);
-          //setIsLiked(false);
+          setLikesCount(currentLikesState => --currentLikesState);
+          setIsLiked(false);
         }
       });
     } else {
-      dispatch(likePhoto(item.id)).then(res => {
-        if ((res?.payload as PhotoModel).id === item.id) {
-          //setLikesCount(currentLikesState => ++currentLikesState);
-          //setIsLiked(true);
-        }
-      });
+      // TODO: it is faster
+      dispatch(likePhoto(item.id));
+      setLikesCount(currentLikesState => ++currentLikesState);
+      setIsLiked(true);
     }
   };
 
@@ -80,10 +72,8 @@ const RenderItem = (props: {
           profileUrl: item.profileImageUrl,
         }}
         footerProps={{
-          // TODO: isLiked, // in this way I pass through the local state that I dont update
-          // TODO: likesCount,
-          isLiked: item.isLiked,
-          likesCount: item.likesCount,
+          isLiked,
+          likesCount,
           onToggleLike,
           imageId: item.id,
         }}
@@ -106,8 +96,6 @@ const ItemSeparatorComponent = () => {
 
 const ImageScreen = () => {
   const [refreshing, setRefreshing] = useState(true);
-  //const isLoading = useAppSelector(state => state.photos.loading);
-  // const [images, setImages] = useState([] as PhotoModel[]);
   const [currentPage, setCurrentPage] = useState(initialImagePageNumber);
   const [searchInputValue, setSearchInputValue] = useState('');
   const dispatch = useAppDispatch();
@@ -116,14 +104,6 @@ const ImageScreen = () => {
   const [orderBy, setOrderBy] = useState(dropdownDataList[0]);
 
   const onRefresh = () => {
-    // imageApi
-    //   .fetchPhotos(page)
-    //   .then(values => {
-    //     // setImages(formatToPhotoModelArray(values));
-    //     setRefreshing(false);
-    //     setCurrentPage(1);
-    //   })
-    //   .catch(error => console.log('fetch error: ', error));
     setRefreshing(true);
     setCurrentPage(initialImagePageNumber);
     dispatch(fetchPhotos(initialImagePageNumber));
@@ -134,11 +114,11 @@ const ImageScreen = () => {
     setRefreshing(false);
   }, [photos]);
 
-  useEffect(() => {
-    if (searchInputValue === '') {
-      setImagesView([]);
-    }
-  }, [searchInputValue]);
+  // useEffect(() => {
+  //   if (searchInputValue === '') {
+  //     setImagesView([]);
+  //   }
+  // }, [searchInputValue]);
 
   useEffect(() => {
     dispatch(fetchPhotos(initialImagePageNumber));
@@ -231,8 +211,15 @@ const ImageScreen = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        onEndReached={fetchMore}
-        onEndReachedThreshold={0.1}
+        // onEndReached={fetchMore}
+        onEndReached={({distanceFromEnd}) => {
+          if (distanceFromEnd >= 0) {
+            console.log('distanceFromEnd:', distanceFromEnd);
+            fetchMore();
+          }
+        }}
+        onEndReachedThreshold={1}
+        // onEndReachedThreshold={0.1}
       />
     </BackgroundForm>
   );
