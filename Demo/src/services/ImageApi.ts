@@ -17,21 +17,31 @@ export type PhotoLikeResponse<T> = {
 
 export interface ImageApiInterface<T> {
   fetchPhotos(): Promise<Array<T>>;
+  likePhoto(id: string): Promise<T>;
+  unlikePhoto(id: string): Promise<T>;
 }
 
 class ImageApi<T> implements ImageApiInterface<T> {
-  async fetchPhotos(): Promise<Array<T>> {
+  async fetchPhotos(page: number = 1): Promise<T[]> {
     return request<Array<T>>(RequestType.fetchPhotos, {
       token: ACCESS_TOKEN,
+      urlParams: {page},
     });
   }
 
-  // async fetchPhotos(page: number = 1): Promise<T[]> {
-  //   return request<Array<T>>(RequestType.fetchPhotos, {
-  //     token: ACCESS_TOKEN,
-  //     urlParams: {page},
-  //   });
-  // }
+  async likePhoto(id: string): Promise<T> {
+    return request<T>(RequestType.likePhoto, {
+      token: ACCESS_TOKEN,
+      params: [`${id}/`],
+    });
+  }
+
+  async unlikePhoto(id: string): Promise<T> {
+    return request<T>(RequestType.unlikePhoto, {
+      token: ACCESS_TOKEN,
+      params: [`${id}/`],
+    });
+  }
 }
 
 export const imageApi = new ImageApi<PhotoDataResponse>();

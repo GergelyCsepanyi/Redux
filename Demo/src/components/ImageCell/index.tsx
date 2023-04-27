@@ -5,6 +5,7 @@ import ImageCellFooter, {ImageCellFooterProps} from '../ImageCellFooter';
 
 export type ImageCellProps = {
   headerProps: ImageCellHeaderProps;
+  footerProps: ImageCellFooterProps;
   imageUrl?: string;
 };
 
@@ -14,11 +15,15 @@ const imageHeight = 300;
 const ImageCell: React.FC<ImageCellProps> = (props: ImageCellProps) => {
   return (
     <View>
+      {/* <Inset horizontal={20}> */}
+      <ImageCellHeader {...props.headerProps} />
+      {/* </Inset> */}
       <Image
         style={styles.imageStyle}
         resizeMode="contain"
         source={{uri: props.imageUrl}}
       />
+      <ImageCellFooter {...props.footerProps} />
     </View>
   );
 };

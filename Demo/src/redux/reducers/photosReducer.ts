@@ -1,5 +1,7 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {fetchPhotos} from '../actions/async/fetchPhotos';
+import {likePhoto} from '../actions/async/likePhoto';
+import {unlikePhoto} from '../actions/async/unlikePhoto';
 
 export type PhotoModel = {
   id: string;
@@ -29,6 +31,29 @@ export const photosSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(fetchPhotos.fulfilled, (state, action) => {
       state.items = action.payload;
+    });
+    builder.addCase(likePhoto.fulfilled, (state, action) => {
+      console.log('like action:', action.payload);
+
+      state.items = state.items.filter(item => {
+        if (item.id === action.payload.id) {
+          console.log('item.id:', item.id);
+          console.log('item.isLiked:', item.isLiked);
+          console.log('action.payload.id:', action.payload.id);
+          console.log('action.payload.isLiked:', action.payload.isLiked);
+          return action.payload;
+        }
+        return item;
+      });
+    });
+    builder.addCase(unlikePhoto.fulfilled, (state, action) => {
+      console.log('unlike action:', action.payload);
+      state.items = state.items.filter(item => {
+        if (item.id === action.payload.id) {
+          return action.payload;
+        }
+        return item;
+      });
     });
   },
 });
