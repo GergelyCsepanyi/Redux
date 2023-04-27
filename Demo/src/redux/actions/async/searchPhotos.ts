@@ -8,7 +8,7 @@ export const searchPhotos = createAsyncThunk<Array<PhotoModel>, string>(
     try {
       const response = await imageApi.searchPhotos(query);
 
-      return response.map(item => ({
+      return response.results.map(item => ({
         id: item.id,
         imageUrl: item.urls?.small,
         isLiked: item.liked_by_user,

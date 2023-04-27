@@ -44,7 +44,7 @@ class ImageApi<T> implements ImageApiInterface<T> {
   }
 
   async searchPhotos(query: string): Promise<T[]> {
-    return request<Array<T>>(RequestType.fetchPhotos, {
+    return request<Array<T>>(RequestType.searchPhotos, {
       token: ACCESS_TOKEN,
       urlParams: {query},
     });

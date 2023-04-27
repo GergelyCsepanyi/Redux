@@ -31,12 +31,11 @@ const getRequestString = (requestType: RequestType, params: string[]) => {
 
   switch (requestType) {
     case RequestType.fetchPhotos:
+    case RequestType.searchPhotos:
       return serviceType;
     case RequestType.likePhoto:
     case RequestType.unlikePhoto:
       return serviceType + params[0] + 'like';
-    case RequestType.searchPhotos:
-      return serviceType + params[0];
   }
 };
 

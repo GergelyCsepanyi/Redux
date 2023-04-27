@@ -20,11 +20,18 @@ import {likePhoto} from '../../redux/actions/async/likePhoto';
 import {unlikePhoto} from '../../redux/actions/async/unlikePhoto';
 import {SearchBar} from '@rneui/base';
 import {searchPhotos} from '../../redux/actions/async/searchPhotos';
+import DropdownComponent, {DropdownData} from '../../components/Dropdown';
 
 export interface ImageScreenState {
   images: Array<PhotoModel>;
   imageApi: ImageApiInterface<PhotoDataResponse>;
 }
+
+const dropdownDataList: DropdownData[] = [
+  {label: 'Latest', value: 'latest'},
+  {label: 'Oldest', value: 'oldest'},
+  {label: 'Popular', value: 'popular'},
+];
 
 const RenderItem = (props: {
   itemInfo: ListRenderItemInfo<PhotoModel>;
@@ -100,6 +107,7 @@ const ImageScreen = () => {
   const dispatch = useAppDispatch();
   const photos = useAppSelector(state => state.photos.items);
   const [imagesView, setImagesView] = useState(photos);
+  const [orderBy, setOrderBy] = useState(dropdownDataList[0]);
 
   useEffect(() => {
     console.log('images loading?', isLoading);
@@ -123,15 +131,15 @@ const ImageScreen = () => {
   }, [searchInputValue]);
 
   useEffect(() => {
-    // dispatch(fetchPhotos())
-    //   .then(() => {
-    //     setImagesView(photos);
-    //     setRefreshing(false);
-    //   })
-    //   .catch(err => console.log('error: ', err));
-    console.log('fetch photos');
-    setImagesView([]);
-    setRefreshing(false);
+    dispatch(fetchPhotos())
+      .then(() => {
+        setImagesView(photos);
+        setRefreshing(false);
+      })
+      .catch(err => console.log('error: ', err));
+    // console.log('fetch photos');
+    // setImagesView([]);
+    // setRefreshing(false);
   }, [dispatch]);
 
   // const formatToPhotoModelArray = (
@@ -180,6 +188,12 @@ const ImageScreen = () => {
     }
   };
 
+  const handleDropdownChange = (item: DropdownData) => {
+    setOrderBy(item);
+    console.log('Dropdown changed:', item.value);
+    // dispatch with param: order_by=item.value
+  };
+
   return (
     <BackgroundForm
       additionalViewStyle={ImageScreenStyles.additionalViewStyle}
@@ -195,6 +209,11 @@ const ImageScreen = () => {
         inputStyle={ImageScreenStyles.searchbarInputStyle}
         onEndEditing={handleEndSearching}
         onTouchStart={handleStartSearching}
+      />
+      <DropdownComponent
+        value={dropdownDataList[0].value}
+        data={dropdownDataList}
+        handleDropdownChange={handleDropdownChange}
       />
       <FlatList
         keyExtractor={(_, index) => String(index)}
