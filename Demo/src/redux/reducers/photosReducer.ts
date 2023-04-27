@@ -2,6 +2,7 @@ import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {fetchPhotos} from '../actions/async/fetchPhotos';
 import {likePhoto} from '../actions/async/likePhoto';
 import {unlikePhoto} from '../actions/async/unlikePhoto';
+import {searchPhotos} from '../actions/async/searchPhotos';
 
 export type PhotoModel = {
   id: string;
@@ -54,6 +55,9 @@ export const photosSlice = createSlice({
         }
         return item;
       });
+    });
+    builder.addCase(searchPhotos.fulfilled, (state, action) => {
+      state.items = action.payload;
     });
   },
 });

@@ -10,6 +10,7 @@ export enum RequestType {
   fetchPhotos,
   likePhoto,
   unlikePhoto,
+  searchPhotos,
 }
 
 const getRequestService = (requestType: RequestType) => {
@@ -18,6 +19,8 @@ const getRequestService = (requestType: RequestType) => {
     case RequestType.likePhoto:
     case RequestType.unlikePhoto:
       return 'photos/';
+    case RequestType.searchPhotos:
+      return 'search/photos/';
     default:
       return '';
   }
@@ -32,12 +35,15 @@ const getRequestString = (requestType: RequestType, params: string[]) => {
     case RequestType.likePhoto:
     case RequestType.unlikePhoto:
       return serviceType + params[0] + 'like';
+    case RequestType.searchPhotos:
+      return serviceType + params[0];
   }
 };
 
 const getRequestType = (requestType: RequestType) => {
   switch (requestType) {
     case RequestType.fetchPhotos:
+    case RequestType.searchPhotos:
       return 'GET';
     case RequestType.likePhoto:
       return 'POST';

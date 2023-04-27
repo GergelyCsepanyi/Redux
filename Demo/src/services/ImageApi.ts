@@ -42,6 +42,13 @@ class ImageApi<T> implements ImageApiInterface<T> {
       params: [`${id}/`],
     });
   }
+
+  async searchPhotos(query: string): Promise<T[]> {
+    return request<Array<T>>(RequestType.fetchPhotos, {
+      token: ACCESS_TOKEN,
+      urlParams: {query},
+    });
+  }
 }
 
 export const imageApi = new ImageApi<PhotoDataResponse>();
