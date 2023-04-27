@@ -18,6 +18,8 @@ import {useAppDispatch, useAppSelector} from '../../hooks/customReduxHooks';
 import {fetchPhotos} from '../../redux/actions/async/fetchPhotos';
 import {likePhoto} from '../../redux/actions/async/likePhoto';
 import {unlikePhoto} from '../../redux/actions/async/unlikePhoto';
+import {SearchBar} from '@rneui/base';
+import {searchPhotos} from '../../redux/actions/async/searchPhotos';
 
 export interface ImageScreenState {
   images: Array<PhotoModel>;
@@ -94,8 +96,10 @@ const ImageScreen = () => {
   const isLoading = useAppSelector(state => state.photos.loading);
   // const [images, setImages] = useState([] as PhotoModel[]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchInputValue, setSearchInputValue] = useState('');
   const dispatch = useAppDispatch();
   const photos = useAppSelector(state => state.photos.items);
+  const [imagesView, setImagesView] = useState(photos);
 
   useEffect(() => {
     console.log('images loading?', isLoading);
@@ -113,11 +117,21 @@ const ImageScreen = () => {
   // }, []);
 
   useEffect(() => {
-    dispatch(fetchPhotos())
-      .then(() => {
-        setRefreshing(false);
-      })
-      .catch(err => console.log('error: ', err));
+    if (searchInputValue !== '') {
+      setImagesView([]);
+    }
+  }, [searchInputValue]);
+
+  useEffect(() => {
+    // dispatch(fetchPhotos())
+    //   .then(() => {
+    //     setImagesView(photos);
+    //     setRefreshing(false);
+    //   })
+    //   .catch(err => console.log('error: ', err));
+    console.log('fetch photos');
+    setImagesView([]);
+    setRefreshing(false);
   }, [dispatch]);
 
   // const formatToPhotoModelArray = (
@@ -150,18 +164,44 @@ const ImageScreen = () => {
   //   });
   // };
 
+  const handleStartSearching = () => {
+    console.log('start searching');
+    setImagesView([]);
+  };
+
+  const handleEndSearching = () => {
+    console.log('end searching: ', searchInputValue);
+    if (searchInputValue !== '') {
+      dispatch(searchPhotos(searchInputValue)).then(() =>
+        setImagesView(photos),
+      );
+    } else {
+      setImagesView(photos);
+    }
+  };
+
   return (
     <BackgroundForm
       additionalViewStyle={ImageScreenStyles.additionalViewStyle}
       backgroundColor="darkslategrey"
       headerProps={{title: 'Images'}}>
       {refreshing ? <ActivityIndicator /> : null}
+      <SearchBar
+        placeholder="Search..."
+        onChangeText={setSearchInputValue}
+        value={searchInputValue}
+        containerStyle={ImageScreenStyles.searchbarContainerStyle}
+        inputContainerStyle={ImageScreenStyles.searchbarInputContainerStyle}
+        inputStyle={ImageScreenStyles.searchbarInputStyle}
+        onEndEditing={handleEndSearching}
+        onTouchStart={handleStartSearching}
+      />
       <FlatList
         keyExtractor={(_, index) => String(index)}
         style={ImageScreenStyles.flatListStyle}
-        data={photos}
+        data={imagesView}
         renderItem={itemInfo => (
-          <RenderItem itemInfo={itemInfo} images={photos} />
+          <RenderItem itemInfo={itemInfo} images={imagesView} />
         )}
         ListEmptyComponent={ListEmptyComponent}
         ItemSeparatorComponent={ItemSeparatorComponent}
