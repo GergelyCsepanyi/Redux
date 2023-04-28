@@ -1,14 +1,15 @@
 import {StyleSheet} from 'react-native';
+import Colors from '../../themes/Colors';
 
 const styles = StyleSheet.create({
   searchbarContainerStyle: {
     width: '100%',
     height: 45,
     alignSelf: 'center',
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     borderRadius: 20,
     justifyContent: 'center',
-    borderColor: 'gray',
+    borderColor: Colors.gray,
     borderWidth: 1,
   },
   searchbarInputContainerStyle: {
@@ -16,7 +17,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'flex-start',
     borderRadius: 0.1,
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
   },
   searchbarInputStyle: {
     height: 35,

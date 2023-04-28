@@ -1,6 +1,7 @@
 import React from 'react';
 import {Image, Text, TouchableOpacity} from 'react-native';
 import styles from './styles';
+import Images from '../../assets/images/Images';
 
 interface LikeButtonProps {
   isLiked: boolean;
@@ -16,10 +17,7 @@ const LikeButton: React.FC<LikeButtonProps> = (props: LikeButtonProps) => {
         props.onToggleLike();
       }}
       style={styles.mainContainerStyle}>
-      <Image
-        source={require('../../assets/images/like.jpeg')}
-        style={styles.imageStyle}
-      />
+      <Image source={Images.like} style={styles.imageStyle} />
       <Text
         style={[styles.textStyle, props.isLiked ? styles.likedTextStyle : {}]}>
         {props.likesCount}

@@ -19,15 +19,10 @@ const RenderItem = (props: {
 
   const onToggleLike = () => {
     if (isLiked) {
-      // TODO: in this way, it is slower but it will only update the states if the server process our request
-      dispatch(unlikePhoto(item.id)).then(res => {
-        if ((res?.payload as PhotoModel).id === item.id) {
-          setLikesCount(currentLikesState => --currentLikesState);
-          setIsLiked(false);
-        }
-      });
+      dispatch(unlikePhoto(item.id));
+      setLikesCount(currentLikesState => --currentLikesState);
+      setIsLiked(false);
     } else {
-      // TODO: it is faster
       dispatch(likePhoto(item.id));
       setLikesCount(currentLikesState => ++currentLikesState);
       setIsLiked(true);

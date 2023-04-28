@@ -1,10 +1,11 @@
 import {StyleSheet} from 'react-native';
+import Colors from '../../themes/Colors';
 
 const styles = StyleSheet.create({
   additionalViewStyle: {
     flex: 1,
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 0,

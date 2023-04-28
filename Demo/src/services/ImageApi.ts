@@ -2,7 +2,7 @@ import {API_ACCESSTOKEN} from '@env';
 import {RequestType, request} from './apiManager';
 import Constants from '../assets/Constants';
 
-const ACCESS_TOKEN = 'dNOyZuHMQNgn6cG3P8KaGtIPPhiqXk0aDtS4310yhwk';
+const ACCESS_TOKEN = API_ACCESSTOKEN;
 
 export type PhotoDataResponse = {
   id: string;
@@ -51,11 +51,12 @@ class ImageApi<T> implements ImageApiInterface<T> {
   async searchPhotos(
     query: string,
     orderBy: string = Constants.DEFAULT_PHOTO_ORDER,
+    page: number = Constants.INITIAL_IMAGE_PAGENUMBER,
   ): Promise<{results: T[]}> {
-    console.log(ACCESS_TOKEN);
+    console.log('searchPhotos params imageApi:', page);
     return request<{results: T[]}>(RequestType.searchPhotos, {
       token: ACCESS_TOKEN,
-      urlParams: {query, order_by: orderBy},
+      urlParams: {query, page, order_by: orderBy},
     });
   }
 }

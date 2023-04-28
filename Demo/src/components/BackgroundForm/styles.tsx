@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import Colors from '../../themes/Colors';
 
 const styles = StyleSheet.create({
   mainContainerStyle: {
@@ -9,7 +10,7 @@ const styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: 22,
-    color: 'white',
+    color: Colors.white,
     fontWeight: 'bold',
     alignSelf: 'center',
   },
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
   childrenContainerStyle: {
     width: '100%',
     height: '100%',
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 0,

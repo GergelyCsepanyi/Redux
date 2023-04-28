@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import Colors from '../../themes/Colors';
 
 const styles = StyleSheet.create({
   mainContainerStyle: {
@@ -12,7 +13,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     alignSelf: 'center',
-    color: 'black',
+    color: Colors.black,
     fontWeight: '400',
   },
   likedTextStyle: {

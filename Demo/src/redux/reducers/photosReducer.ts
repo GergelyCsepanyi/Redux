@@ -32,7 +32,11 @@ export const photosSlice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(fetchPhotos.fulfilled, (state, action) => {
-      state.items = action.payload;
+      if (action.meta.arg.concatResult) {
+        state.items = state.items.concat(action.payload);
+      } else {
+        state.items = action.payload;
+      }
     });
     builder.addCase(fetchMorePhotos.fulfilled, (state, action) => {
       state.items = state.items.concat(action.payload);
@@ -61,7 +65,11 @@ export const photosSlice = createSlice({
       });
     });
     builder.addCase(searchPhotos.fulfilled, (state, action) => {
-      state.items = action.payload;
+      if (action.meta.arg.concatResult) {
+        state.items = state.items.concat(action.payload);
+      } else {
+        state.items = action.payload;
+      }
     });
   },
 });

@@ -18,9 +18,9 @@ const getRequestService = (requestType: RequestType) => {
     case RequestType.fetchPhotos:
     case RequestType.likePhoto:
     case RequestType.unlikePhoto:
-      return 'photos/';
+      return 'photos';
     case RequestType.searchPhotos:
-      return 'search/photos/';
+      return 'search/photos';
     default:
       return '';
   }
@@ -35,7 +35,7 @@ const getRequestString = (requestType: RequestType, params: string[]) => {
       return serviceType;
     case RequestType.likePhoto:
     case RequestType.unlikePhoto:
-      return serviceType + params[0] + 'like';
+      return `${serviceType}/${params[0]}like`;
   }
 };
 

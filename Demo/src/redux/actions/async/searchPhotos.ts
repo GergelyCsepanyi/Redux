@@ -1,11 +1,13 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {imageApi} from '../../../services/ImageApi';
 import {PhotoModel} from '../../reducers/photosReducer';
-import {DEFAULT_PHOTO_ORDER} from '../../../assets/Constants';
+import Constants from '../../../assets/Constants';
 
 type SearchPhotosArgType = {
+  page?: number;
   query: string;
   orderBy?: string;
+  concatResult?: boolean;
 };
 
 export const searchPhotos = createAsyncThunk<
@@ -13,9 +15,9 @@ export const searchPhotos = createAsyncThunk<
   SearchPhotosArgType
 >(
   'photos/searchPhotos',
-  async ({query, orderBy = DEFAULT_PHOTO_ORDER}, thunkApi) => {
+  async ({page, query, orderBy = Constants.DEFAULT_PHOTO_ORDER}, thunkApi) => {
     try {
-      const response = await imageApi.searchPhotos(query, orderBy);
+      const response = await imageApi.searchPhotos(query, orderBy, page);
 
       return response.results.map(item => ({
         id: item.id,

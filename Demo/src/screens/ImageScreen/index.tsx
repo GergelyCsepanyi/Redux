@@ -82,12 +82,25 @@ const ImageScreen = () => {
     console.log('currentPAge:', currentPage);
 
     setRefreshing(true);
-    dispatch(fetchMorePhotos(nextPage));
     setCurrentPage(nextPage);
+
+    if (searchInputValue !== '') {
+      dispatch(
+        searchPhotos({
+          query: searchInputValue,
+          page: nextPage,
+          orderBy,
+          concatResult: true,
+        }),
+      );
+    } else {
+      dispatch(fetchPhotos({page: nextPage, orderBy, concatResult: true}));
+    }
   };
 
   const handleStartSearching = () => {
     console.log('start searching');
+    setCurrentPage(Constants.INITIAL_IMAGE_PAGENUMBER);
     setImagesView([]);
   };
 
@@ -116,7 +129,14 @@ const ImageScreen = () => {
       console.log('Dropdown changed:', item.value);
       setOrderBy(item.value);
       if (searchInputValue !== '') {
-        dispatch(searchPhotos({query: searchInputValue, orderBy: item.value}));
+        dispatch(
+          searchPhotos({
+            query: searchInputValue,
+            orderBy: item.value,
+            page: Constants.INITIAL_IMAGE_PAGENUMBER,
+            concatResult: false,
+          }),
+        );
       } else {
         dispatch(fetchPhotos({orderBy: item.value}));
       }
@@ -159,19 +179,19 @@ const ImageScreen = () => {
         renderItem={itemInfo => (
           <RenderItem itemInfo={itemInfo} images={imagesView} />
         )}
-        ListEmptyComponent={ListEmptyComponent}
+        ListEmptyComponent={photos?.length > 0 ? null : ListEmptyComponent}
         ItemSeparatorComponent={ItemSeparatorComponent}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        // onEndReached={fetchMore}
-        // onEndReached={({distanceFromEnd}) => {
-        //   if (distanceFromEnd >= 0) {
-        //     console.log('distanceFromEnd:', distanceFromEnd);
-        //     fetchMore();
-        //   }
-        // }}
-        // onEndReachedThreshold={0.1}
+        // TODO: onEndReached={fetchMore}
+        onEndReached={({distanceFromEnd}) => {
+          if (distanceFromEnd < 0.1 && photos?.length > 0) {
+            console.log('distanceFromEnd:', distanceFromEnd);
+            fetchMore();
+          }
+        }}
+        onEndReachedThreshold={0.1}
       />
     </BackgroundForm>
   );

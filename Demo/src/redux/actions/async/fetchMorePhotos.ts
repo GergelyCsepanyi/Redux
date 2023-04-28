@@ -1,12 +1,27 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {imageApi} from '../../../services/ImageApi';
 import {PhotoModel} from '../../reducers/photosReducer';
+import Constants from '../../../assets/Constants';
 
-export const fetchMorePhotos = createAsyncThunk<Array<PhotoModel>, number>(
+type FetchMorePhotosArgType = {
+  page?: number;
+  orderBy?: string;
+};
+
+export const fetchMorePhotos = createAsyncThunk<
+  Array<PhotoModel>,
+  FetchMorePhotosArgType
+>(
   'photos/fetchMorePhotos',
-  async (page: number = 1, thunkApi) => {
+  async (
+    {
+      page = Constants.INITIAL_IMAGE_PAGENUMBER,
+      orderBy = Constants.DEFAULT_PHOTO_ORDER,
+    },
+    thunkApi,
+  ) => {
     try {
-      const response = await imageApi.fetchPhotos(page);
+      const response = await imageApi.fetchPhotos(page, orderBy);
 
       return response.map(item => ({
         id: item.id,

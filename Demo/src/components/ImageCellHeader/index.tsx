@@ -2,6 +2,7 @@ import React from 'react';
 import {Image, Text, View} from 'react-native';
 import styles from './styles';
 import {Queue} from 'react-native-spacing-system';
+import Images from '../../assets/images/Images';
 
 export type ImageCellHeaderProps = {
   profileUrl?: string;
@@ -18,7 +19,7 @@ const ImageCellHeader: React.FC<ImageCellHeaderProps> = (
         source={
           props.authorName
             ? {uri: props.profileUrl}
-            : require('../../assets/images/profileImagePlaceholder.jpg')
+            : Images.profileImagePlaceholder
         }
       />
       <Queue size={10} />

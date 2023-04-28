@@ -1,13 +1,14 @@
 import {StyleSheet} from 'react-native';
+import Colors from '../../themes/Colors';
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     padding: 16,
   },
   dropdown: {
     height: 50,
-    borderColor: 'gray',
+    borderColor: Colors.gray,
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
@@ -17,7 +18,7 @@ const styles = StyleSheet.create({
   },
   label: {
     position: 'absolute',
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
     left: 22,
     top: 8,
     zIndex: 999,
