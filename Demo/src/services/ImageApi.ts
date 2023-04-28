@@ -3,7 +3,7 @@ import {RequestType, request} from './apiManager';
 import {
   DEFAULT_PHOTO_ORDER,
   INITIAL_IMAGE_PAGENUMBER,
-} from '../assets/constants';
+} from '../assets/Constants';
 
 const ACCESS_TOKEN = 'dNOyZuHMQNgn6cG3P8KaGtIPPhiqXk0aDtS4310yhwk';
 

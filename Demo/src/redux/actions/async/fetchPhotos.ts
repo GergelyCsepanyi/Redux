@@ -4,7 +4,7 @@ import {PhotoModel} from '../../reducers/photosReducer';
 import {
   DEFAULT_PHOTO_ORDER,
   INITIAL_IMAGE_PAGENUMBER,
-} from '../../../assets/constants';
+} from '../../../assets/Constants';
 
 type FetchPhotosArgType = {
   page?: number;
@@ -31,8 +31,6 @@ export const fetchPhotos = createAsyncThunk<
         name: item.user?.name,
         likesCount: item.likes,
       }));
-
-      //return [];
     } catch (error) {
       console.log('fetchPhotos error: ', error);
       return thunkApi.rejectWithValue(error);

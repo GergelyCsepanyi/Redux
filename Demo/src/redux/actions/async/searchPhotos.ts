@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {imageApi} from '../../../services/ImageApi';
 import {PhotoModel} from '../../reducers/photosReducer';
-import {DEFAULT_PHOTO_ORDER} from '../../../assets/constants';
+import {DEFAULT_PHOTO_ORDER} from '../../../assets/Constants';
 
 type SearchPhotosArgType = {
   query: string;

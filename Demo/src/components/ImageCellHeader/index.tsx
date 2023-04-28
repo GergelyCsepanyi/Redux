@@ -1,6 +1,6 @@
 import React from 'react';
 import {Image, Text, View} from 'react-native';
-import ImageCellHeaderStyles from './styles';
+import styles from './styles';
 import {Queue} from 'react-native-spacing-system';
 
 export type ImageCellHeaderProps = {
@@ -12,9 +12,9 @@ const ImageCellHeader: React.FC<ImageCellHeaderProps> = (
   props: ImageCellHeaderProps,
 ) => {
   return (
-    <View style={ImageCellHeaderStyles.headerContainerStyle}>
+    <View style={styles.headerContainerStyle}>
       <Image
-        style={ImageCellHeaderStyles.profileImageStyle}
+        style={styles.profileImageStyle}
         source={
           props.authorName
             ? {uri: props.profileUrl}
@@ -22,7 +22,7 @@ const ImageCellHeader: React.FC<ImageCellHeaderProps> = (
         }
       />
       <Queue size={10} />
-      <Text style={ImageCellHeaderStyles.nameTextStyle}>
+      <Text style={styles.nameTextStyle}>
         {props.authorName ?? 'Incognito'}
       </Text>
     </View>

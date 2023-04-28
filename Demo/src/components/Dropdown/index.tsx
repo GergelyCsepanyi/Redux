@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
-import {styles} from './styles';
+import styles from './styles';
 import Colors from '../../themes/Colors';
 
 type DropdownComponentProps = {

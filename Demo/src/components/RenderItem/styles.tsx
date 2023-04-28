@@ -1,12 +1,9 @@
 import {StyleSheet} from 'react-native/types';
 
 const styles = StyleSheet.create({
-  footerContainerStyle: {
-    height: 26,
-    alignItems: 'center',
-    flexDirection: 'row',
+  imageContainerStyle: {
+    width: '100%',
   },
-  imageStyle: {},
 });
 
 export default styles;
