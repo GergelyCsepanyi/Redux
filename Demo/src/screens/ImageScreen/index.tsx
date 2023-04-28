@@ -17,7 +17,6 @@ import {useAppDispatch, useAppSelector} from '../../hooks/customReduxHooks';
 import {fetchPhotos} from '../../redux/actions/async/fetchPhotos';
 import {likePhoto} from '../../redux/actions/async/likePhoto';
 import {unlikePhoto} from '../../redux/actions/async/unlikePhoto';
-import {SearchBar} from '@rneui/base';
 import {searchPhotos} from '../../redux/actions/async/searchPhotos';
 import DropdownComponent, {DropdownDataFields} from '../../components/Dropdown';
 import {fetchMorePhotos} from '../../redux/actions/async/fetchMorePhotos';
@@ -26,6 +25,7 @@ import {
   DropdownDataValue,
   INITIAL_IMAGE_PAGENUMBER,
 } from '../../assets/constants';
+import SearchBarComponent from '../../components/Searchbar';
 
 export interface ImageScreenState {
   images: Array<PhotoModel>;
@@ -42,11 +42,10 @@ const RenderItem = (props: {
   itemInfo: ListRenderItemInfo<PhotoModel>;
   images: PhotoModel[];
 }) => {
+  const dispatch = useAppDispatch();
   const {item} = props.itemInfo;
-
   const [isLiked, setIsLiked] = useState(item.isLiked);
   const [likesCount, setLikesCount] = useState(item.likesCount);
-  const dispatch = useAppDispatch();
 
   const onToggleLike = () => {
     if (isLiked) {
@@ -97,20 +96,13 @@ const ItemSeparatorComponent = () => {
 };
 
 const ImageScreen = () => {
+  const dispatch = useAppDispatch();
+  const photos = useAppSelector(state => state.photos.items);
   const [refreshing, setRefreshing] = useState(true);
   const [currentPage, setCurrentPage] = useState(INITIAL_IMAGE_PAGENUMBER);
   const [searchInputValue, setSearchInputValue] = useState('');
-  const dispatch = useAppDispatch();
-  const photos = useAppSelector(state => state.photos.items);
   const [imagesView, setImagesView] = useState(photos);
   const [orderBy, setOrderBy] = useState(DEFAULT_PHOTO_ORDER as string);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    setSearchInputValue('');
-    setCurrentPage(INITIAL_IMAGE_PAGENUMBER);
-    dispatch(fetchPhotos({orderBy}));
-  };
 
   useEffect(() => {
     dispatch(fetchPhotos({}));
@@ -121,6 +113,13 @@ const ImageScreen = () => {
     setImagesView(photos);
     setRefreshing(false);
   }, [photos]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setSearchInputValue('');
+    setCurrentPage(INITIAL_IMAGE_PAGENUMBER);
+    dispatch(fetchPhotos({orderBy}));
+  };
 
   const fetchMore = () => {
     if (refreshing) {
@@ -162,45 +161,45 @@ const ImageScreen = () => {
     }
   };
 
-  // const SearchBarComponent = () => {
-  //   return (
-  //     <SearchBar
-  //       placeholder="Search..."
-  //       onChangeText={setSearchInputValue}
-  //       value={searchInputValue}
-  //       containerStyle={ImageScreenStyles.searchbarContainerStyle}
-  //       inputContainerStyle={ImageScreenStyles.searchbarInputContainerStyle}
-  //       inputStyle={ImageScreenStyles.searchbarInputStyle}
-  //       onEndEditing={handleEndSearching}
-  //       onTouchStart={handleStartSearching}
-  //     />
-  //   );
-  // };
+  const handleCancel = () => {
+    setSearchInputValue('');
+    handleEndSearching();
+  };
+
+  const handleClear = () => {
+    setSearchInputValue('');
+    handleStartSearching();
+  };
+
+  const renderSearchbar = () => {
+    return SearchBarComponent({
+      placeholder: 'Search...',
+      value: searchInputValue,
+      onChangeText: setSearchInputValue,
+      onEndEditing: handleEndSearching,
+      onTouchStart: handleStartSearching,
+      onClear: handleClear,
+      onCancel: handleCancel,
+    });
+  };
+
+  const renderDropdown = () => {
+    return DropdownComponent({
+      data: dropdownDataList,
+      handleDropdownChange,
+      label: 'Sort by',
+      value: dropdownDataList[0].value,
+    });
+  };
 
   return (
     <BackgroundForm
       additionalViewStyle={ImageScreenStyles.additionalViewStyle}
       backgroundColor="darkslategrey"
       headerProps={{title: 'Images'}}
-      //searchbar={SearchBarComponent()}
-    >
+      searchbar={renderSearchbar()}
+      dropdown={renderDropdown()}>
       {refreshing ? <ActivityIndicator /> : null}
-      <SearchBar
-        placeholder="Search..."
-        onChangeText={setSearchInputValue}
-        value={searchInputValue}
-        containerStyle={ImageScreenStyles.searchbarContainerStyle}
-        inputContainerStyle={ImageScreenStyles.searchbarInputContainerStyle}
-        inputStyle={ImageScreenStyles.searchbarInputStyle}
-        onEndEditing={handleEndSearching}
-        onTouchStart={handleStartSearching}
-      />
-      <DropdownComponent
-        label="Sort by"
-        value={dropdownDataList[0].value}
-        data={dropdownDataList}
-        handleDropdownChange={handleDropdownChange}
-      />
       <FlatList
         keyExtractor={(_, index) => String(index)}
         style={ImageScreenStyles.flatListStyle}

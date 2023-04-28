@@ -21,8 +21,9 @@ export type PhotoLikeResponse<T> = {
 
 export interface ImageApiInterface<T> {
   fetchPhotos(): Promise<Array<T>>;
-  likePhoto(id: string): Promise<T>;
-  unlikePhoto(id: string): Promise<T>;
+  likePhoto(id: string): Promise<{photo: T}>;
+  unlikePhoto(id: string): Promise<{photo: T}>;
+  searchPhotos(query: string, orderBy: string): Promise<{results: T[]}>;
 }
 
 class ImageApi<T> implements ImageApiInterface<T> {
@@ -36,15 +37,15 @@ class ImageApi<T> implements ImageApiInterface<T> {
     });
   }
 
-  async likePhoto(id: string): Promise<T> {
-    return request<T>(RequestType.likePhoto, {
+  async likePhoto(id: string): Promise<{photo: T}> {
+    return request<{photo: T}>(RequestType.likePhoto, {
       token: ACCESS_TOKEN,
       params: [`${id}/`],
     });
   }
 
-  async unlikePhoto(id: string): Promise<T> {
-    return request<T>(RequestType.unlikePhoto, {
+  async unlikePhoto(id: string): Promise<{photo: T}> {
+    return request<{photo: T}>(RequestType.unlikePhoto, {
       token: ACCESS_TOKEN,
       params: [`${id}/`],
     });
@@ -53,9 +54,9 @@ class ImageApi<T> implements ImageApiInterface<T> {
   async searchPhotos(
     query: string,
     orderBy: string = DEFAULT_PHOTO_ORDER,
-  ): Promise<T[]> {
+  ): Promise<{results: T[]}> {
     console.log(ACCESS_TOKEN);
-    return request<Array<T>>(RequestType.searchPhotos, {
+    return request<{results: T[]}>(RequestType.searchPhotos, {
       token: ACCESS_TOKEN,
       urlParams: {query, order_by: orderBy},
     });

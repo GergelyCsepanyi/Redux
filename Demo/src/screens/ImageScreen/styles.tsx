@@ -27,26 +27,6 @@ const ImageScreenStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  searchbarContainerStyle: {
-    width: '100%',
-    height: 35,
-    alignSelf: 'center',
-    backgroundColor: 'white',
-    borderRadius: 20,
-    justifyContent: 'center',
-  },
-  searchbarInputContainerStyle: {
-    height: 35,
-    alignSelf: 'center',
-    justifyContent: 'flex-start',
-    borderRadius: 8,
-    backgroundColor: 'white',
-  },
-  searchbarInputStyle: {
-    height: 35,
-    alignSelf: 'center',
-    justifyContent: 'flex-start',
-  },
 });
 
 export default ImageScreenStyles;

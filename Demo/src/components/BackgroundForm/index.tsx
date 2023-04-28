@@ -14,7 +14,8 @@ interface BackgroundFormProps {
   children: React.ReactNode;
   backgroundColor: string;
   headerProps: {title: string};
-  //searchbar: JSX.Element;
+  searchbar: JSX.Element;
+  dropdown: JSX.Element;
 
   additionalViewStyle?: StyleProp<ViewStyle>;
 }
@@ -38,6 +39,14 @@ class BackgroundForm extends React.Component<BackgroundFormProps, {}> {
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <View style={[BackgroundFormStyles.childrenContainerStyle]}>
+              <View style={BackgroundFormStyles.searchbarAndDropdownContainer}>
+                <View style={BackgroundFormStyles.searchbarContainer}>
+                  {this.props.searchbar}
+                </View>
+                <View style={BackgroundFormStyles.dropdownContainer}>
+                  {this.props.dropdown}
+                </View>
+              </View>
               {this.props.children}
             </View>
           </KeyboardAvoidingView>
