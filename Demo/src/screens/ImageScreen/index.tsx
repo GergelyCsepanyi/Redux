@@ -1,0 +1,196 @@
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
+import {ImageApiInterface, PhotoDataResponse} from '../../services/ImageApi';
+import styles from './styles';
+import {Stack} from 'react-native-spacing-system';
+import BackgroundForm from '../../components/BackgroundForm';
+import {PhotoModel} from '../../redux/reducers/photosReducer';
+import {useAppDispatch, useAppSelector} from '../../hooks/customReduxHooks';
+import {fetchPhotos} from '../../redux/actions/async/fetchPhotos';
+import {searchPhotos} from '../../redux/actions/async/searchPhotos';
+import DropdownComponent, {DropdownDataFields} from '../../components/Dropdown';
+import Constants from '../../assets/Constants';
+import SearchBarComponent from '../../components/Searchbar';
+import RenderItem from '../../components/RenderItem';
+
+export interface ImageScreenState {
+  images: Array<PhotoModel>;
+  imageApi: ImageApiInterface<PhotoDataResponse>;
+}
+
+const dropdownDataList: DropdownDataFields[] = [
+  {label: 'Latest', value: Constants.DropdownDataValue.latest},
+  {label: 'Oldest', value: Constants.DropdownDataValue.oldest},
+  {label: 'Popular', value: Constants.DropdownDataValue.popular},
+];
+
+const ListEmptyComponent = () => {
+  return (
+    <View style={styles.emptyContainerStyle}>
+      <Text style={styles.emptyTextStyle}>No images yet</Text>
+    </View>
+  );
+};
+
+const ItemSeparatorComponent = () => {
+  return <Stack size={20} />;
+};
+
+const ImageScreen = () => {
+  const dispatch = useAppDispatch();
+  const photos = useAppSelector(state => state.photos.items);
+  const [refreshing, setRefreshing] = useState(true);
+  const [currentPage, setCurrentPage] = useState(
+    Constants.INITIAL_IMAGE_PAGENUMBER,
+  );
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const [imagesView, setImagesView] = useState(photos);
+  const [orderBy, setOrderBy] = useState(
+    Constants.DEFAULT_PHOTO_ORDER as string,
+  );
+  const flatListRef = useRef<FlatList>(null);
+
+  useEffect(() => {
+    dispatch(fetchPhotos({}));
+    setRefreshing(true);
+  }, [dispatch]);
+
+  useEffect(() => {
+    setImagesView(photos);
+    setRefreshing(false);
+  }, [photos]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setSearchInputValue('');
+    setCurrentPage(Constants.INITIAL_IMAGE_PAGENUMBER);
+    dispatch(fetchPhotos({orderBy}));
+  };
+
+  const fetchMore = () => {
+    if (refreshing) {
+      return;
+    }
+
+    const nextPage = currentPage + 1;
+
+    setRefreshing(true);
+    setCurrentPage(nextPage);
+
+    if (searchInputValue !== '') {
+      dispatch(
+        searchPhotos({
+          query: searchInputValue,
+          page: nextPage,
+          orderBy,
+          concatResult: true,
+        }),
+      );
+    } else {
+      dispatch(fetchPhotos({page: nextPage, orderBy, concatResult: true}));
+    }
+  };
+
+  const handleStartSearching = () => {
+    setCurrentPage(Constants.INITIAL_IMAGE_PAGENUMBER);
+    setImagesView([]);
+  };
+
+  const handleEndSearching = () => {
+    if (searchInputValue !== '') {
+      dispatch(searchPhotos({query: searchInputValue, orderBy}));
+      setRefreshing(true);
+    } else {
+      dispatch(fetchPhotos({orderBy}));
+    }
+  };
+
+  const handleCancel = () => {
+    setSearchInputValue('');
+    handleEndSearching();
+  };
+
+  const handleClear = () => {
+    setSearchInputValue('');
+    handleStartSearching();
+  };
+
+  const handleDropdownChange = (item: DropdownDataFields) => {
+    if (item.value !== orderBy) {
+      setOrderBy(item.value);
+      flatListRef.current?.scrollToIndex({index: 0, animated: true});
+      if (searchInputValue !== '') {
+        dispatch(
+          searchPhotos({
+            query: searchInputValue,
+            orderBy: item.value,
+            page: Constants.INITIAL_IMAGE_PAGENUMBER,
+            concatResult: false,
+          }),
+        );
+      } else {
+        dispatch(fetchPhotos({orderBy: item.value}));
+      }
+    }
+  };
+
+  const renderSearchbar = () => {
+    return SearchBarComponent({
+      placeholder: 'Search...',
+      value: searchInputValue,
+      onChangeText: setSearchInputValue,
+      onEndEditing: handleEndSearching,
+      onTouchStart: handleStartSearching,
+      onClear: handleClear,
+      onCancel: handleCancel,
+    });
+  };
+
+  const renderDropdown = () => {
+    return DropdownComponent({
+      data: dropdownDataList,
+      handleDropdownChange,
+      label: 'Sort by',
+      value: dropdownDataList[0].value,
+    });
+  };
+
+  return (
+    <BackgroundForm
+      additionalViewStyle={styles.additionalViewStyle}
+      backgroundColor="darkslategrey"
+      headerProps={{title: 'Images'}}
+      searchbar={renderSearchbar()}
+      dropdown={renderDropdown()}>
+      {refreshing ? <ActivityIndicator /> : null}
+      <FlatList
+        keyExtractor={(_, index) => String(index)}
+        style={styles.flatListStyle}
+        data={imagesView}
+        renderItem={itemInfo => (
+          <RenderItem itemInfo={itemInfo} images={imagesView} />
+        )}
+        ListEmptyComponent={photos?.length > 0 ? null : ListEmptyComponent}
+        ItemSeparatorComponent={ItemSeparatorComponent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        onEndReached={({distanceFromEnd}) => {
+          if (distanceFromEnd > 0.2 && photos?.length > 0) {
+            fetchMore();
+          }
+        }}
+        onEndReachedThreshold={0.5}
+        ref={flatListRef}
+      />
+    </BackgroundForm>
+  );
+};
+
+export default ImageScreen;
