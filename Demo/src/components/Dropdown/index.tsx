@@ -16,12 +16,13 @@ import {styles} from './styles';
 // ];
 
 type DropdownComponentProps = {
-  data: DropdownData[];
-  handleDropdownChange(value: DropdownData): void;
+  data: DropdownDataFields[];
+  handleDropdownChange(value: DropdownDataFields): void;
   value: string;
+  label: string;
 };
 
-export type DropdownData = {
+export type DropdownDataFields = {
   label: string;
   value: string;
 };
@@ -34,7 +35,7 @@ const DropdownComponent = (props: DropdownComponentProps) => {
     if (value || isFocus) {
       return (
         <Text style={[styles.label, isFocus && {color: 'blue'}]}>
-          Dropdown label
+          {props.label}
         </Text>
       );
     }
@@ -65,6 +66,7 @@ const DropdownComponent = (props: DropdownComponentProps) => {
           setIsFocus(false);
           setValue(item.value);
         }}
+
         // renderLeftIcon={() => (
         //   <AntDesign
         //     style={styles.icon}

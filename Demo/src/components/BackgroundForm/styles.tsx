@@ -5,6 +5,7 @@ const BackgroundFormStyles = StyleSheet.create({
     flex: 1,
   },
   titleContainerStyle: {
+    //flex: 1,
     paddingBottom: 10,
   },
   titleStyle: {
@@ -14,6 +15,8 @@ const BackgroundFormStyles = StyleSheet.create({
     alignSelf: 'center',
   },
   childrenContainerStyle: {
+    // TODO: remove flex and add //height: '100%',
+    //flex: 1,
     width: '100%',
     height: '100%',
     backgroundColor: 'white',
@@ -22,6 +25,7 @@ const BackgroundFormStyles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: 30,
     paddingBottom: 50,
+    //borderWidth: 8,
   },
 });
 

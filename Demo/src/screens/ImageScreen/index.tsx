@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ListRenderItemInfo} from 'react-native/types';
 import {
   Text,
@@ -13,28 +13,30 @@ import ImageCell from '../../components/ImageCell';
 import {Stack} from 'react-native-spacing-system';
 import BackgroundForm from '../../components/BackgroundForm';
 import {PhotoModel} from '../../redux/reducers/photosReducer';
-import {imageApi} from '../../services/ImageApi';
 import {useAppDispatch, useAppSelector} from '../../hooks/customReduxHooks';
 import {fetchPhotos} from '../../redux/actions/async/fetchPhotos';
 import {likePhoto} from '../../redux/actions/async/likePhoto';
 import {unlikePhoto} from '../../redux/actions/async/unlikePhoto';
 import {SearchBar} from '@rneui/base';
 import {searchPhotos} from '../../redux/actions/async/searchPhotos';
-import DropdownComponent, {DropdownData} from '../../components/Dropdown';
+import DropdownComponent, {DropdownDataFields} from '../../components/Dropdown';
 import {fetchMorePhotos} from '../../redux/actions/async/fetchMorePhotos';
+import {
+  DEFAULT_PHOTO_ORDER,
+  DropdownDataValue,
+  INITIAL_IMAGE_PAGENUMBER,
+} from '../../assets/constants';
 
 export interface ImageScreenState {
   images: Array<PhotoModel>;
   imageApi: ImageApiInterface<PhotoDataResponse>;
 }
 
-const dropdownDataList: DropdownData[] = [
-  {label: 'Latest', value: 'latest'},
-  {label: 'Oldest', value: 'oldest'},
-  {label: 'Popular', value: 'popular'},
+const dropdownDataList: DropdownDataFields[] = [
+  {label: 'Latest', value: DropdownDataValue.latest},
+  {label: 'Oldest', value: DropdownDataValue.oldest},
+  {label: 'Popular', value: DropdownDataValue.popular},
 ];
-
-const initialImagePageNumber = 1;
 
 const RenderItem = (props: {
   itemInfo: ListRenderItemInfo<PhotoModel>;
@@ -96,59 +98,39 @@ const ItemSeparatorComponent = () => {
 
 const ImageScreen = () => {
   const [refreshing, setRefreshing] = useState(true);
-  const [currentPage, setCurrentPage] = useState(initialImagePageNumber);
+  const [currentPage, setCurrentPage] = useState(INITIAL_IMAGE_PAGENUMBER);
   const [searchInputValue, setSearchInputValue] = useState('');
   const dispatch = useAppDispatch();
   const photos = useAppSelector(state => state.photos.items);
   const [imagesView, setImagesView] = useState(photos);
-  const [orderBy, setOrderBy] = useState(dropdownDataList[0]);
+  const [orderBy, setOrderBy] = useState(DEFAULT_PHOTO_ORDER as string);
 
   const onRefresh = () => {
     setRefreshing(true);
-    setCurrentPage(initialImagePageNumber);
-    dispatch(fetchPhotos(initialImagePageNumber));
+    setSearchInputValue('');
+    setCurrentPage(INITIAL_IMAGE_PAGENUMBER);
+    dispatch(fetchPhotos({orderBy}));
   };
+
+  useEffect(() => {
+    dispatch(fetchPhotos({}));
+    setRefreshing(true);
+  }, [dispatch]);
 
   useEffect(() => {
     setImagesView(photos);
     setRefreshing(false);
   }, [photos]);
 
-  // useEffect(() => {
-  //   if (searchInputValue === '') {
-  //     setImagesView([]);
-  //   }
-  // }, [searchInputValue]);
-
-  useEffect(() => {
-    dispatch(fetchPhotos(initialImagePageNumber));
-
-    setRefreshing(true);
-    // .then(() => {
-    //   //setImagesView(photos);
-    // })
-    // .catch(err => console.log('error: ', err));
-    // console.log('fetch photos');
-    // setImagesView([]);
-    // setRefreshing(false);
-  }, [dispatch]);
-
   const fetchMore = () => {
     if (refreshing) {
       return;
     }
-    setRefreshing(true);
 
     const nextPage = currentPage + 1;
     console.log('currentPAge:', currentPage);
-    // imageApi.fetchPhotos(nextPage).then(values => {
-    //   const newData = formatToPhotoModelArray(values);
 
-    //   setCurrentPage(nextPage);
-    //   setRefreshing(false);
-    //   setImages(currentData => [...currentData, ...newData]);
-    // });
-
+    setRefreshing(true);
     dispatch(fetchMorePhotos(nextPage));
     setCurrentPage(nextPage);
   };
@@ -161,28 +143,47 @@ const ImageScreen = () => {
   const handleEndSearching = () => {
     console.log('end searching: ', searchInputValue);
     if (searchInputValue !== '') {
-      dispatch(searchPhotos(searchInputValue));
-      // .then(() =>
-      //   setImagesView(photos),
-      // );
+      dispatch(searchPhotos({query: searchInputValue, orderBy}));
       setRefreshing(true);
     } else {
-      //setImagesView(photos);
-      dispatch(fetchPhotos(initialImagePageNumber));
+      dispatch(fetchPhotos({orderBy}));
     }
   };
 
-  const handleDropdownChange = (item: DropdownData) => {
-    setOrderBy(item);
-    console.log('Dropdown changed:', item.value);
-    // dispatch with param: order_by=item.value
+  const handleDropdownChange = (item: DropdownDataFields) => {
+    if (item.value !== orderBy) {
+      console.log('Dropdown changed:', item.value);
+      setOrderBy(item.value);
+      if (searchInputValue !== '') {
+        dispatch(searchPhotos({query: searchInputValue, orderBy: item.value}));
+      } else {
+        dispatch(fetchPhotos({orderBy: item.value}));
+      }
+    }
   };
+
+  // const SearchBarComponent = () => {
+  //   return (
+  //     <SearchBar
+  //       placeholder="Search..."
+  //       onChangeText={setSearchInputValue}
+  //       value={searchInputValue}
+  //       containerStyle={ImageScreenStyles.searchbarContainerStyle}
+  //       inputContainerStyle={ImageScreenStyles.searchbarInputContainerStyle}
+  //       inputStyle={ImageScreenStyles.searchbarInputStyle}
+  //       onEndEditing={handleEndSearching}
+  //       onTouchStart={handleStartSearching}
+  //     />
+  //   );
+  // };
 
   return (
     <BackgroundForm
       additionalViewStyle={ImageScreenStyles.additionalViewStyle}
       backgroundColor="darkslategrey"
-      headerProps={{title: 'Images'}}>
+      headerProps={{title: 'Images'}}
+      //searchbar={SearchBarComponent()}
+    >
       {refreshing ? <ActivityIndicator /> : null}
       <SearchBar
         placeholder="Search..."
@@ -195,6 +196,7 @@ const ImageScreen = () => {
         onTouchStart={handleStartSearching}
       />
       <DropdownComponent
+        label="Sort by"
         value={dropdownDataList[0].value}
         data={dropdownDataList}
         handleDropdownChange={handleDropdownChange}
@@ -212,13 +214,12 @@ const ImageScreen = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         // onEndReached={fetchMore}
-        onEndReached={({distanceFromEnd}) => {
-          if (distanceFromEnd >= 0) {
-            console.log('distanceFromEnd:', distanceFromEnd);
-            fetchMore();
-          }
-        }}
-        onEndReachedThreshold={1}
+        // onEndReached={({distanceFromEnd}) => {
+        //   if (distanceFromEnd >= 0) {
+        //     console.log('distanceFromEnd:', distanceFromEnd);
+        //     fetchMore();
+        //   }
+        // }}
         // onEndReachedThreshold={0.1}
       />
     </BackgroundForm>

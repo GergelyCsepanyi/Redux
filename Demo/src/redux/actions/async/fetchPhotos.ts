@@ -1,12 +1,27 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {imageApi} from '../../../services/ImageApi';
 import {PhotoModel} from '../../reducers/photosReducer';
+import {
+  DEFAULT_PHOTO_ORDER,
+  INITIAL_IMAGE_PAGENUMBER,
+} from '../../../assets/constants';
 
-export const fetchPhotos = createAsyncThunk<Array<PhotoModel>, number>(
+type FetchPhotosArgType = {
+  page?: number;
+  orderBy?: string;
+};
+
+export const fetchPhotos = createAsyncThunk<
+  Array<PhotoModel>,
+  FetchPhotosArgType
+>(
   'photos/fetchPhotos',
-  async (page: number = 1, thunkApi) => {
+  async (
+    {page = INITIAL_IMAGE_PAGENUMBER, orderBy = DEFAULT_PHOTO_ORDER},
+    thunkApi,
+  ) => {
     try {
-      const response = await imageApi.fetchPhotos(page);
+      const response = await imageApi.fetchPhotos(page, orderBy);
 
       return response.map(item => ({
         id: item.id,
@@ -16,6 +31,8 @@ export const fetchPhotos = createAsyncThunk<Array<PhotoModel>, number>(
         name: item.user?.name,
         likesCount: item.likes,
       }));
+
+      //return [];
     } catch (error) {
       console.log('fetchPhotos error: ', error);
       return thunkApi.rejectWithValue(error);

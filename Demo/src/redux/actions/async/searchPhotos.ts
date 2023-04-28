@@ -1,12 +1,21 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {imageApi} from '../../../services/ImageApi';
 import {PhotoModel} from '../../reducers/photosReducer';
+import {DEFAULT_PHOTO_ORDER} from '../../../assets/constants';
 
-export const searchPhotos = createAsyncThunk<Array<PhotoModel>, string>(
+type SearchPhotosArgType = {
+  query: string;
+  orderBy?: string;
+};
+
+export const searchPhotos = createAsyncThunk<
+  Array<PhotoModel>,
+  SearchPhotosArgType
+>(
   'photos/searchPhotos',
-  async (query: string, thunkApi) => {
+  async ({query, orderBy = DEFAULT_PHOTO_ORDER}, thunkApi) => {
     try {
-      const response = await imageApi.searchPhotos(query);
+      const response = await imageApi.searchPhotos(query, orderBy);
 
       return response.results.map(item => ({
         id: item.id,

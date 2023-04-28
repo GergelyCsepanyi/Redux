@@ -14,6 +14,7 @@ interface BackgroundFormProps {
   children: React.ReactNode;
   backgroundColor: string;
   headerProps: {title: string};
+  //searchbar: JSX.Element;
 
   additionalViewStyle?: StyleProp<ViewStyle>;
 }
@@ -31,6 +32,7 @@ class BackgroundForm extends React.Component<BackgroundFormProps, {}> {
             <Text style={BackgroundFormStyles.titleStyle}>
               {this.props.headerProps.title}
             </Text>
+            {/* {this.props.searchbar} */}
           </View>
 
           <KeyboardAvoidingView
