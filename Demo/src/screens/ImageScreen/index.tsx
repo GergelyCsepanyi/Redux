@@ -101,6 +101,16 @@ const ImageScreen = () => {
     }
   };
 
+  const handleCancel = () => {
+    setSearchInputValue('');
+    handleEndSearching();
+  };
+
+  const handleClear = () => {
+    setSearchInputValue('');
+    handleStartSearching();
+  };
+
   const handleDropdownChange = (item: DropdownDataFields) => {
     if (item.value !== orderBy) {
       console.log('Dropdown changed:', item.value);
@@ -111,16 +121,6 @@ const ImageScreen = () => {
         dispatch(fetchPhotos({orderBy: item.value}));
       }
     }
-  };
-
-  const handleCancel = () => {
-    setSearchInputValue('');
-    handleEndSearching();
-  };
-
-  const handleClear = () => {
-    setSearchInputValue('');
-    handleStartSearching();
   };
 
   const renderSearchbar = () => {

@@ -1,9 +1,6 @@
 import {API_ACCESSTOKEN} from '@env';
 import {RequestType, request} from './apiManager';
-import {
-  DEFAULT_PHOTO_ORDER,
-  INITIAL_IMAGE_PAGENUMBER,
-} from '../assets/Constants';
+import Constants from '../assets/Constants';
 
 const ACCESS_TOKEN = 'dNOyZuHMQNgn6cG3P8KaGtIPPhiqXk0aDtS4310yhwk';
 
@@ -28,8 +25,8 @@ export interface ImageApiInterface<T> {
 
 class ImageApi<T> implements ImageApiInterface<T> {
   async fetchPhotos(
-    page: number = INITIAL_IMAGE_PAGENUMBER,
-    orderBy: string = DEFAULT_PHOTO_ORDER,
+    page: number = Constants.INITIAL_IMAGE_PAGENUMBER,
+    orderBy: string = Constants.DEFAULT_PHOTO_ORDER,
   ): Promise<T[]> {
     return request<Array<T>>(RequestType.fetchPhotos, {
       token: ACCESS_TOKEN,
@@ -53,7 +50,7 @@ class ImageApi<T> implements ImageApiInterface<T> {
 
   async searchPhotos(
     query: string,
-    orderBy: string = DEFAULT_PHOTO_ORDER,
+    orderBy: string = Constants.DEFAULT_PHOTO_ORDER,
   ): Promise<{results: T[]}> {
     console.log(ACCESS_TOKEN);
     return request<{results: T[]}>(RequestType.searchPhotos, {
