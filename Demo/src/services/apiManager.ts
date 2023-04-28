@@ -114,8 +114,6 @@ export const request = async <T>(
     getRequestString(requestType, params.params || []) +
     paramsString;
 
-  console.log('url:', url);
-
   return new Promise<T>((resolve, reject) => {
     fetch(url, {
       method: getRequestType(requestType),

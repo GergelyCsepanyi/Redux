@@ -1,6 +1,5 @@
-import React, {useEffect, useState, useRef, RefObject} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {SearchBar} from '@rneui/base';
-import {SearchBarBaseProps} from '@rneui/base/dist/SearchBar/types';
 import styles from './styles';
 import Colors from '../../themes/Colors';
 import {TextInput} from 'react-native/types';
@@ -17,9 +16,8 @@ type SearchBarComponentProps = {
 
 const SearchBarComponent = (props: SearchBarComponentProps) => {
   const [isFocus, setIsFocus] = useState(false);
-  const searchBarRef = useRef<
-    RefObject<SearchBar> & RefObject<SearchBarBaseProps> & RefObject<TextInput>
-  >();
+
+  const searchBarRef = useRef<SearchBar & TextInput>(null);
 
   useEffect(() => {
     if (isFocus) {

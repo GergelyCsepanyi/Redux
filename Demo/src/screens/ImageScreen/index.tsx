@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Text,
   View,
@@ -15,7 +15,6 @@ import {useAppDispatch, useAppSelector} from '../../hooks/customReduxHooks';
 import {fetchPhotos} from '../../redux/actions/async/fetchPhotos';
 import {searchPhotos} from '../../redux/actions/async/searchPhotos';
 import DropdownComponent, {DropdownDataFields} from '../../components/Dropdown';
-import {fetchMorePhotos} from '../../redux/actions/async/fetchMorePhotos';
 import Constants from '../../assets/Constants';
 import SearchBarComponent from '../../components/Searchbar';
 import RenderItem from '../../components/RenderItem';
@@ -55,6 +54,7 @@ const ImageScreen = () => {
   const [orderBy, setOrderBy] = useState(
     Constants.DEFAULT_PHOTO_ORDER as string,
   );
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     dispatch(fetchPhotos({}));
@@ -79,7 +79,6 @@ const ImageScreen = () => {
     }
 
     const nextPage = currentPage + 1;
-    console.log('currentPAge:', currentPage);
 
     setRefreshing(true);
     setCurrentPage(nextPage);
@@ -99,13 +98,11 @@ const ImageScreen = () => {
   };
 
   const handleStartSearching = () => {
-    console.log('start searching');
     setCurrentPage(Constants.INITIAL_IMAGE_PAGENUMBER);
     setImagesView([]);
   };
 
   const handleEndSearching = () => {
-    console.log('end searching: ', searchInputValue);
     if (searchInputValue !== '') {
       dispatch(searchPhotos({query: searchInputValue, orderBy}));
       setRefreshing(true);
@@ -126,8 +123,8 @@ const ImageScreen = () => {
 
   const handleDropdownChange = (item: DropdownDataFields) => {
     if (item.value !== orderBy) {
-      console.log('Dropdown changed:', item.value);
       setOrderBy(item.value);
+      flatListRef.current?.scrollToIndex({index: 0, animated: true});
       if (searchInputValue !== '') {
         dispatch(
           searchPhotos({
@@ -184,14 +181,13 @@ const ImageScreen = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        // TODO: onEndReached={fetchMore}
         onEndReached={({distanceFromEnd}) => {
-          if (distanceFromEnd < 0.1 && photos?.length > 0) {
-            console.log('distanceFromEnd:', distanceFromEnd);
+          if (distanceFromEnd > 0.2 && photos?.length > 0) {
             fetchMore();
           }
         }}
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={0.5}
+        ref={flatListRef}
       />
     </BackgroundForm>
   );

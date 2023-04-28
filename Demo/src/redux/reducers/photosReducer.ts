@@ -3,7 +3,6 @@ import {fetchPhotos} from '../actions/async/fetchPhotos';
 import {likePhoto} from '../actions/async/likePhoto';
 import {unlikePhoto} from '../actions/async/unlikePhoto';
 import {searchPhotos} from '../actions/async/searchPhotos';
-import {fetchMorePhotos} from '../actions/async/fetchMorePhotos';
 
 export type PhotoModel = {
   id: string;
@@ -38,25 +37,15 @@ export const photosSlice = createSlice({
         state.items = action.payload;
       }
     });
-    builder.addCase(fetchMorePhotos.fulfilled, (state, action) => {
-      state.items = state.items.concat(action.payload);
-    });
     builder.addCase(likePhoto.fulfilled, (state, action) => {
-      console.log('like action:', action.payload);
-
       state.items = state.items.filter(item => {
         if (item.id === action.payload.id) {
-          console.log('item.id:', item.id);
-          console.log('item.isLiked:', item.isLiked);
-          console.log('action.payload.id:', action.payload.id);
-          console.log('action.payload.isLiked:', action.payload.isLiked);
           return action.payload;
         }
         return item;
       });
     });
     builder.addCase(unlikePhoto.fulfilled, (state, action) => {
-      console.log('unlike action:', action.payload);
       state.items = state.items.filter(item => {
         if (item.id === action.payload.id) {
           return action.payload;

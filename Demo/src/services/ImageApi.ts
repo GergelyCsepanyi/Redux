@@ -53,7 +53,6 @@ class ImageApi<T> implements ImageApiInterface<T> {
     orderBy: string = Constants.DEFAULT_PHOTO_ORDER,
     page: number = Constants.INITIAL_IMAGE_PAGENUMBER,
   ): Promise<{results: T[]}> {
-    console.log('searchPhotos params imageApi:', page);
     return request<{results: T[]}>(RequestType.searchPhotos, {
       token: ACCESS_TOKEN,
       urlParams: {query, page, order_by: orderBy},
